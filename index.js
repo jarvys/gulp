@@ -6,13 +6,16 @@ var gutil = require('gulp-util');
 var deprecated = require('deprecated');
 var vfs = require('vinyl-fs');
 
-function Gulp(){
+function Gulp() {
   Orchestrator.call(this);
+  this.on('err', function(err) {
+    console.log(err);
+  });
 }
 util.inherits(Gulp, Orchestrator);
 
 Gulp.prototype.task = Gulp.prototype.add;
-Gulp.prototype.run = function(){
+Gulp.prototype.run = function() {
   // run() is deprecated as of 3.5 and will be removed in 4.0
   // use task dependencies instead
 
@@ -24,7 +27,7 @@ Gulp.prototype.run = function(){
 
 Gulp.prototype.src = vfs.src;
 Gulp.prototype.dest = vfs.dest;
-Gulp.prototype.watch = function (glob, opt, fn) {
+Gulp.prototype.watch = function(glob, opt, fn) {
   if (!fn) {
     fn = opt;
     opt = null;
@@ -32,12 +35,8 @@ Gulp.prototype.watch = function (glob, opt, fn) {
 
   // array of tasks given
   if (Array.isArray(fn)) {
-    return vfs.watch(glob, opt, function(){
-      this.start.apply(this, fn, function(err) {
-        // TODO 
-        // have a try first
-        console.log(err);
-      });
+    return vfs.watch(glob, opt, function() {
+      this.start.apply(this, fn);
     }.bind(this));
   }
 
