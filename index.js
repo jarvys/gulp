@@ -8,9 +8,6 @@ var vfs = require('vinyl-fs');
 
 function Gulp() {
   Orchestrator.call(this);
-  this.on('err', function(err) {
-    console.log(err);
-  });
 }
 util.inherits(Gulp, Orchestrator);
 

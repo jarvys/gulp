@@ -13,15 +13,15 @@ var cli = new Liftoff({
   completions: require('../lib/completion')
 });
 
-cli.on('require', function (name) {
+cli.on('require', function(name) {
   gutil.log('Requiring external module', gutil.colors.magenta(name));
 });
 
-cli.on('requireFail', function (name) {
+cli.on('requireFail', function(name) {
   gutil.log(gutil.colors.red('Failed to load external module'), gutil.colors.magenta(name));
 });
 
-cli.launch(function () {
+cli.launch(function() {
   handleArguments(this);
 });
 
@@ -63,14 +63,15 @@ function handleArguments(args) {
   gutil.log('Using gulpfile', gutil.colors.magenta(args.configPath));
 
   var gulpInst = require(args.modulePath);
+
   logEvents(gulpInst);
-  
+
   if (process.cwd() !== args.cwd) {
     process.chdir(args.cwd);
     gutil.log('Working directory changed to', gutil.colors.magenta(args.cwd));
   }
-  
-  process.nextTick(function () {
+
+  process.nextTick(function() {
     if (tasksFlag) {
       return logTasks(gulpFile, gulpInst);
     }
@@ -81,7 +82,7 @@ function handleArguments(args) {
 function logTasks(gulpFile, localGulp) {
   var tree = taskTree(localGulp.tasks);
   tree.label = 'Tasks for ' + gutil.colors.magenta(gulpFile);
-  archy(tree).split('\n').forEach(function (v) {
+  archy(tree).split('\n').forEach(function(v) {
     if (v.trim().length === 0) return;
     gutil.log(v);
   });
@@ -96,24 +97,28 @@ function formatError(e) {
 
 // wire up logging events
 function logEvents(gulpInst) {
-  gulpInst.on('task_start', function (e) {
+  gulpInst.on('task_start', function(e) {
     gutil.log('Running', "'" + gutil.colors.cyan(e.task) + "'...");
   });
 
-  gulpInst.on('task_stop', function (e) {
+  gulpInst.on('task_stop', function(e) {
     var time = prettyTime(e.hrDuration);
     gutil.log('Finished', "'" + gutil.colors.cyan(e.task) + "'", 'in', gutil.colors.magenta(time));
   });
 
-  gulpInst.on('task_err', function (e) {
+  gulpInst.on('task_err', function(e) {
     var msg = formatError(e);
     var time = prettyTime(e.hrDuration);
     gutil.log('Errored', "'" + gutil.colors.cyan(e.task) + "'", 'in', gutil.colors.magenta(time), gutil.colors.red(msg));
   });
 
-  gulpInst.on('task_not_found', function (err) {
+  gulpInst.on('task_not_found', function(err) {
     gutil.log(gutil.colors.red("Task '" + err.task + "' was not defined in your gulpfile but you tried to run it."));
     gutil.log('Please check the documentation for proper gulpfile formatting.');
     process.exit(1);
+  });
+
+  gulpInst.on("err", function(err) {
+    console.log(err);
   });
 }
